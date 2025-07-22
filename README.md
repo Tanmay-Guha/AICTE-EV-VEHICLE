@@ -1,94 +1,165 @@
-# 🔋 Electric Vehicle Population Analysis & Prediction
+# 🔋 Electric Vehicle Forecasting by County
 
-**Project Name:** `TANMAY_GUHA_MONTH1ipynb`
+**Project:** TANMAY-GUHA-WEEK2.ipynb
 **Author:** Tanmay Guha
 
-This project analyzes and predicts electric vehicle adoption patterns using a dataset titled `Electric_Vehicle_Population_By_County.csv`. It performs thorough preprocessing, outlier handling, and builds a machine learning model using Random Forest Regressor.
+This project performs advanced forecasting of Electric Vehicle (EV) adoption trends across various counties using time-series feature engineering and a tuned Random Forest Regressor. It includes historical analysis, feature extraction, lag-based forecasting, and county-wise 3-year prediction.
 
 ---
 
-## 📌 Objectives
+## 🎯 Objectives
 
-* Analyze electric vehicle distribution across counties
-* Handle missing data and outliers
-* Apply Random Forest Regression to predict EV adoption
-* Evaluate model performance using error metrics (MAE, RMSE, R²)
+* Clean and preprocess EV population data
+* Engineer time-series features (lags, rolling averages, slopes)
+* Train a Random Forest model for predicting EV counts
+* Generate 3-year monthly forecasts for all counties
+* Visualize top 5 counties by cumulative EV adoption
 
 ---
 
-## 📂 Dataset
+## 🧰 Tech Stack & Libraries
+
+| Tool                            | Use                                 |
+| ------------------------------- | ----------------------------------- |
+| Python                          | Programming Language                |
+| Pandas, NumPy                   | Data handling & numerical computing |
+| Seaborn, Matplotlib             | Data visualization                  |
+| Scikit-learn                    | Machine learning                    |
+| Joblib                          | Model persistence                   |
+| Jupyter Notebook / Google Colab | Development Environment             |
+
+---
+
+## 📊 Dataset
 
 **File Used:** `Electric_Vehicle_Population_By_County.csv`
-**Key Columns:**
+Key columns:
 
-* `Date` — Date of record
-* `County`, `State` — Geographic location
-* `Electric Vehicle (EV) Total` — Number of EVs
-* `Percent Electric Vehicles` — % of total vehicles that are EVs
+* `Date`
+* `County`, `State`
+* `Electric Vehicle (EV) Total`
+* `Battery Electric Vehicles (BEVs)`, `PHEVs`, `Non-Electric Vehicle Total`
+* `Percent Electric Vehicles`
 
 ---
 
-## 🛠️ Libraries Used
+## 🔧 Preprocessing & Feature Engineering
 
-```python
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import joblib
+* Converted `Date` column to datetime
+* Filled nulls in `County`/`State`, removed rows with missing target
+* Detected and capped outliers using IQR method
+* Converted numeric columns to correct types
+* Extracted date-based features: year, month, numeric\_date
+* Created lag features (`lag1`, `lag2`, `lag3`)
+* Rolling mean (3-month)
+* Percent change over 1 and 3 months
+* 6-month EV growth slope (via linear regression)
+* Cumulative EV counts
+
+---
+
+## 🤖 Model Training
+
+* **Model:** RandomForestRegressor
+
+* **Tuning:** RandomizedSearchCV (30 iterations with CV=3)
+
+* **Target:** `Electric Vehicle (EV) Total`
+
+* **Features Used:**
+
+  ```text
+  months_since_start, county_encoded, ev_total_lag1,
+  ev_total_lag2, ev_total_lag3, ev_total_roll_mean_3,
+  ev_total_pct_change_1, ev_total_pct_change_3, ev_growth_slope
+  ```
+
+* **Evaluation Metrics:**
+
+  * MAE
+  * RMSE
+  * R² Score
+  * Visual: Actual vs Predicted Plot
+
+---
+
+## 📈 Forecasting
+
+* Forecasts generated for **next 36 months (3 years)** per county
+* Predicts future EV adoption using latest historical trends
+* Combines both:
+
+  * **Individual Forecast:** e.g., Kings County
+  * **Multi-County Forecast:** All counties in dataset
+
+---
+
+## 📊 Visualizations
+
+* Stacked column chart (BEV vs PHEV vs Non-EV)
+* Actual vs Predicted line plot
+* Feature importance bar chart
+* County-wise forecast line plot
+* Top 5 counties: cumulative EV growth forecast
+
+---
+
+## 💾 Model Saving
+
+* Trained model saved as:
+
+  ```bash
+  forecasting_ev_model.pkl
+  ```
+* Test predictions with saved model loaded using `joblib`
+
+---
+
+## ✨ Improvisations Done by Me
+
+1. **Outlier Handling with Capping** using IQR
+2. **Lag, rolling average, and percent change features** for time-series learning
+3. **Growth slope calculation** using rolling linear regression
+4. **County-wise forecasting loop** for all regions with cumulative trends
+5. **Interactive and informative visualizations** for interpretability
+6. **Hyperparameter tuning** via RandomizedSearchCV for better accuracy
+7. **Model serialization** for deployment or reuse
+8. **Forecast validation** using real vs predicted comparison
+
+---
+
+## 📂 How to Run
+
+### Setup Environment
+
+```bash
+pip install pandas numpy matplotlib seaborn scikit-learn joblib
+```
+
+### Run Notebook
+
+Launch Jupyter Notebook or open in Google Colab:
+
+```bash
+jupyter notebook TANMAY-GUHA-WEEK2.ipynb
 ```
 
 ---
 
-## 🔍 Workflow Summary
+## 📈 Sample Output
 
-### ✅ Data Loading & Exploration
-
-* Load CSV with `pandas`
-* View initial data, types, shape
-* Identify missing values and data issues
-
-### 🔧 Data Cleaning
-
-* Convert `Date` to datetime
-* Drop or fill missing values in key columns (`County`, `State`, `EV Total`)
-* Remove rows with invalid dates or null target values
-
-### 🚨 Outlier Detection & Treatment
-
-* Use IQR to identify and cap outliers in `Percent Electric Vehicles`
-
-```python
-Q1 = df['Percent Electric Vehicles'].quantile(0.25)
-Q3 = df['Percent Electric Vehicles'].quantile(0.75)
-IQR = Q3 - Q1
-df['Percent Electric Vehicles'] = np.where(df['Percent Electric Vehicles'] > upper_bound, upper_bound,
-      np.where(df['Percent Electric Vehicles'] < lower_bound, lower_bound, df['Percent Electric Vehicles']))
-```
-
-### 📊 Feature Engineering & Model Training
-
-* Label encoding if necessary
-* Train/Test split
-* Model: `RandomForestRegressor`
-* Tuning: `RandomizedSearchCV` (if applied)
-
-### 📈 Model Evaluation
-
-* MAE, RMSE, R² Score
-* Save model with `joblib` for future use
+* Best Parameters of Random Forest printed
+* Metrics: `MAE`, `RMSE`, `R²`
+* Predicted vs Actual line graph
+* Feature importances
+* 3-year forecast for top 5 counties
 
 ---
 
-## 📊 Output
+## 📇 Author Info
 
-* Cleaned and processed EV dataset
-* Outlier-handled data
-* RandomForest prediction model
-* Evaluation metrics with visualizations
+**Tanmay Guha**
+
+*BTech CSE - Data Science Student*
 
 ---
