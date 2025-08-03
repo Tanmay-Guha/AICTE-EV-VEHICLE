@@ -1,6 +1,6 @@
 # 🔋 Electric Vehicle Forecasting by County
 
-**Project:** TANMAY-GUHA-WEEK2.ipynb
+**Project:** TANMAY_GUHA_EV_FINAL.ipynb
 **Author:** Tanmay Guha
 
 This project performs advanced forecasting of Electric Vehicle (EV) adoption trends across various counties using time-series feature engineering and a tuned Random Forest Regressor. It includes historical analysis, feature extraction, lag-based forecasting, and county-wise 3-year prediction.
@@ -141,7 +141,7 @@ pip install pandas numpy matplotlib seaborn scikit-learn joblib
 Launch Jupyter Notebook or open in Google Colab:
 
 ```bash
-jupyter notebook TANMAY-GUHA-WEEK2.ipynb
+jupyter notebook TANMAY_GUHA_EV_FINAL.ipynb
 ```
 
 ---
